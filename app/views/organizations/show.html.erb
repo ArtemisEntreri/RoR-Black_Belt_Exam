@@ -1,0 +1,28 @@
+<h4><%= link_to "Dashboard", organizations_index_path %> | <%= link_to "Logout", sessions_destroy_path %></h4>
+
+<% if !flash[:plan_errors].nil?
+	flash[:plan_errors].each do |error| %>
+	<h3><%= error %></h3>
+	<% end %>
+<% end %>
+
+<%  if !(@members.empty?) 
+	@members.each do |member|
+		if member.user_id == session[:user_id] && member.organization_id == @org.id
+			@status = button_to 'Leave Group', plans_destroy_path(:user_id => session[:user_id], :organization_id => @org.id)
+			break
+		else
+			@status = button_to "Join Group", plans_create_path(:user_id => session[:user_id], :organization_id => @org.id)
+		end
+	end
+else
+	@status = button_to "Join Group", plans_create_path(:user_id => session[:user_id], :organization_id => @org.id)
+end %>
+<h2><%= @org.name %><%= @status %></h2>
+<h4><%= @org.description %></h4>
+
+<h3>Created By: <%= @org.first_name + " " + @org.last_name %></h3>
+<h4>Members:</h4>
+<% @members.each do |member| %>
+	<h5><%= member.first_name + " " + member.last_name %></h5>
+<% end %>

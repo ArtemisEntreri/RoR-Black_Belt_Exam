@@ -1,0 +1,44 @@
+<h1>Hi <%= @user.first_name + " " + @user.last_name + "!"%></h1>  
+<h2><%= link_to 'Logout', sessions_destroy_path %></h2>
+
+
+<% if !@orgs.empty? %>
+	<div id="orgs">	
+		<h2>Here are the Organizations you may join:</h2>
+		<% @orgs.each do |org|
+			if org.user_id == session[:user_id] %>
+				<h3><%= link_to org.name, '/organizations/'+ org.id.to_s %> | <%= link_to '(Delete Event)', organizations_destroy_path(:id => org.id) %></h3>
+			<% else %>
+				<h3><%= link_to org.name, '/organizations/'+ org.id.to_s %></h3>
+			<% end %>
+			<% if !(@members.empty?)
+				@memberCount = 0
+				@members.each do |member|
+					if member.organization_id == org.id
+						(@memberCount += 1)
+					end
+				end
+			end %>
+			<h4 class="indent">Members:<%= @memberCount %></h4>
+			<h4 class="indent"><%= org.description %></h4>
+		<% end %>
+	</div>
+<% end %>
+
+<h2>Create a new Organization</h2>
+<% if !flash[:errors].nil?
+	flash[:errors].each do |error| %>
+		<h4><%= error %></h4>
+	<% end %>
+<% end %>
+<div id="form">	
+	<form action="/organizations/create" id="disc" method="post">
+		<input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden"/>
+		<input type="hidden" name="user_id" value="<%= session[:user_id] %>">
+		<label>Organization Name:</label>
+			<input type="text" name="name">
+		<label>Description:</label>
+			<textarea name="description" cols="30" rows="10"></textarea>
+		<input id=box type="Submit" value="Create">
+	</form>
+</div>
